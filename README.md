@@ -14,8 +14,8 @@
 
 ## 🛠 Tecnologías usadas
 
-- ☕ Java – Lenguaje principal para la lógica del backend
-- 🌱 Spring Boot – Framework para construir el API REST de forma rápida y robusta
+- ☕ Java 19 – Lenguaje principal para la lógica del backend
+- 🌱 Spring Boot 3.5.0 – Framework para construir el API REST de forma rápida y robusta
 - 🐘 PostgreSQL – Base de datos relacional para almacenar tareas, usuarios y configuraciones
 - 🔐 Spring Security + JWT – Autenticación y autorización segura basada en tokens
 - 🌐 REST API – Comunicación eficiente entre cliente y servidor
