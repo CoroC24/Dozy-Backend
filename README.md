@@ -14,15 +14,15 @@
 
 ## 🛠 Tecnologías usadas
 
-- ☕ Java 19 – Lenguaje principal para la lógica del backend
-- 🌱 Spring Boot 3.5.0 – Framework para construir el API REST de forma rápida y robusta
-- 🐘 PostgreSQL – Base de datos relacional para almacenar tareas, usuarios y configuraciones
-- 🔐 Spring Security + JWT – Autenticación y autorización segura basada en tokens
-- 🌐 REST API – Comunicación eficiente entre cliente y servidor
-- 📄 Swagger / OpenAPI – Documentación interactiva del API
-- 📦 Maven – Gestión de dependencias y construcción del proyecto
-- 🌍 Docker – Contenerización para facilitar el despliegue
-- ☁️ (Próximamente) Cloud Hosting (Render, Heroku, AWS...) – Para disponibilidad online del servicio
+- ☕ Java 19 
+- 🌱 Spring Boot 3.5.0 
+- 🐘 PostgreSQL 
+- 🔐 Spring Security + JWT 
+- 🌐 REST API 
+- 📄 Swagger / OpenAPI 
+- 📦 Maven 
+- 🌍 Docker
+- ☁️ (Próximamente) Cloud Hosting (Render, Heroku, AWS...)
 
 ## 📸 Capturas de pantalla (proximamente)
 
