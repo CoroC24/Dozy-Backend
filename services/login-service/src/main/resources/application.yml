@@ -1,0 +1,26 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: login-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/dozy_login_db
+    username: dozyadmin
+    password: dozy@dmin.12345
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  jwt:
+    secret: dozySecretKeyDozy1234567890
+    expirationMs: 3600000
+
+  logging:
+    level:
+      org.springframework.security: DEBUG
