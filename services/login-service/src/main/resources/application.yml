@@ -18,7 +18,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
   jwt:
-    secret: dozySecretKeyDozy1234567890
+    secret: dozy.backend.service_SecretKeyLoginDozy1234567890
     expirationMs: 3600000
 
   logging:
