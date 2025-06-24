@@ -6,9 +6,9 @@ spring:
     name: login-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/dozy_login_db
-    username: dozyadmin
-    password: dozy@dmin.12345
+    url: jdbc:postgresql://localhost:5432/dozy_login
+    username: postgres
+    password: coroadmin
     driver-class-name: org.postgresql.Driver
 
   jpa:

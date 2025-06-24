@@ -1,5 +1,8 @@
 package com.cj.dozy.login.service;
 
+import com.cj.dozy.login.dto.LoginRequest;
+import com.cj.dozy.login.dto.RegisterRequest;
+import com.cj.dozy.login.dto.UserResponse;
 import com.cj.dozy.login.model.User;
 import com.cj.dozy.login.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,28 +18,34 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    /**
-     * Registra un nuevo usuario.
-     *
-     * @return el usuario guardado (sin contraseña en texto plano)
-     * @throws IllegalArgumentException si el usuario ya existe
-     */
-    public User registerUser(User user) {
-        user = User.builder()
-                .username(user.getUsername())
-                .password(passwordEncoder.encode(user.getPassword()))
-                .role("USER")
+    public void register(RegisterRequest request) {
+        if (userRepository.existsByUsername(request.getUsername()) ||
+                userRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("Email or Username already registered");
+        }
+
+        User user = User.builder()
+                .username(request.getUsername())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
                 .build();
-        return userRepository.save(user);
+
+        userRepository.save(user);
     }
 
-    /**
-     * Busca un usuario por su username.
-     *
-     * @param username nombre de usuario
-     * @return Optional con el usuario
-     */
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public UserResponse login(LoginRequest request) {
+        Optional<User> userOpt = userRepository
+                .findByUsernameOrEmail(request.getUsernameOrEmail(), request.getUsernameOrEmail());
+
+        if (userOpt.isEmpty()){
+            throw new IllegalArgumentException("User not found");
+        }
+
+        User user = userOpt.get();
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Incorrect Password");
+        }
+
+        return new UserResponse(user.getId(), user.getUsername(), user.getEmail());
     }
 }
