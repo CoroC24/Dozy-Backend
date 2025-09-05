@@ -19,10 +19,9 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     public void register(RegisterRequest request) {
-        if (userRepository.existsByUsername(request.getUsername()) ||
-                userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email or Username already registered");
-        }
+        if (userRepository.existsByEmail(request.getEmail())) throw new IllegalArgumentException("Email already registered");
+
+        if (userRepository.existsByUsername(request.getUsername())) throw new IllegalArgumentException("Username already registered");
 
         User user = User.builder()
                 .username(request.getUsername())
@@ -37,7 +36,7 @@ public class UserService {
         Optional<User> userOpt = userRepository
                 .findByUsernameOrEmail(request.getUsernameOrEmail(), request.getUsernameOrEmail());
 
-        if (userOpt.isEmpty()){
+        if (userOpt.isEmpty()) {
             throw new IllegalArgumentException("User not found");
         }
 
