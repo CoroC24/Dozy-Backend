@@ -17,6 +17,9 @@ public class TaskService {
     private final TaskRepository taskRepository;
 
     public Task addTask(AddTaskRequest addTask) {
+        if (addTask.getTitle().isEmpty() || addTask.getDate().isEmpty() || addTask.getStatus().isEmpty())
+            throw new IllegalArgumentException("The task to be added cannot have the following fields empty: Title, Date, or Status");
+
         Task task = Task
                 .builder()
                 .title(addTask.getTitle())
@@ -31,7 +34,10 @@ public class TaskService {
     }
 
     public void modifyTask(ModTaskRequest modTask) {
-        if (!taskRepository.existsById(modTask.getId())) throw new NoSuchElementException("Task to modify doesn't exists in DB");
+        if (!taskRepository.existsById(modTask.getId())) throw new NoSuchElementException("The task to be modified doesn't exists in DB");
+
+        if (modTask.getTitle().isEmpty() || modTask.getDate().isEmpty() || modTask.getStatus().isEmpty())
+            throw new IllegalArgumentException("The task to be modified cannot have the following fields empty: Title, Date, or Status");
 
         Task taskToMod = taskRepository.findTaskById(modTask.getId());
         taskToMod.setTitle(modTask.getTitle());
@@ -45,7 +51,7 @@ public class TaskService {
     }
 
     public void deleteTask(DelTaskRequest delTask) {
-        if (!taskRepository.existsById(delTask.getId())) throw new NoSuchElementException("Task to modify doesn't exists in DB");
+        if (!taskRepository.existsById(delTask.getId())) throw new NoSuchElementException("The task to be deleted doesn't exists in DB");
 
         Task taskToDel = taskRepository.findTaskById(delTask.getId());
         taskToDel.setId(delTask.getId());

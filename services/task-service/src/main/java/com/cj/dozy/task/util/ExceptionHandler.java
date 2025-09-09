@@ -31,7 +31,6 @@ public class ExceptionHandler {
         body.put("error", status.getReasonPhrase());
         body.put("message", message);
         body.put("path", path);
-        body.put("exceptionInfo", exceptionInfo);
 
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
