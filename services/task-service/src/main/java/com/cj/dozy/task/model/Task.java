@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "task")
+@Table(name = "tasks")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -35,4 +35,7 @@ public class Task {
 
     @Column(nullable = false)
     private String status;
+
+    @Column(nullable = false)
+    private Long userId;
 }
