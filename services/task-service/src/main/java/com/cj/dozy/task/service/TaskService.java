@@ -112,27 +112,22 @@ public class TaskService {
         List<Long> tasksIds = delTaskReq.getTasks().stream().map(DelTaskRequest::getId).toList();
         Set<Long> existingIds = taskRepository.findAllById(tasksIds).stream().map(Task::getId).collect(Collectors.toSet());
 
-        List<Long> validIds = new ArrayList<>();
         List<DelTaskResponse> responses = new ArrayList<>();
+        List<Long> idsToDelete = new ArrayList<>();
 
-        IntStream.range(0, tasksIds.size()).forEach(i -> {
-            if (existingIds.contains(tasksIds.get(i))) {
-                validIds.add(tasksIds.get(i));
+        for (DelTaskRequest taskReq : delTaskReq.getTasks()) {
+            Long id = taskReq.getId();
+            String uuid = taskReq.getUuid();
+
+            if (existingIds.contains(id)) {
+                idsToDelete.add(id);
+                responses.add(new DelTaskResponse(uuid, id, "Task deleted successfully"));
             } else {
-                responses.add(new DelTaskResponse(
-                        delTaskReq.getTasks().get(i).getUuid(),
-                        tasksIds.get(i),
-                        "Task not found in DB, cannot be deleted"
-                ));
+                responses.add(new DelTaskResponse(uuid, id, "Task not found in DB, cannot be deleted"));
             }
-        });
-
-        if (!validIds.isEmpty()) {
-            taskRepository.deleteAllById(tasksIds);
-
-            IntStream.range(0, validIds.size()).forEach(i ->
-                    responses.add(new DelTaskResponse(delTaskReq.getTasks().get(i).getUuid(), validIds.get(i), "Task deleted successfully")));
         }
+
+        if (!idsToDelete.isEmpty()) taskRepository.deleteAllById(idsToDelete);
 
         return new DelTaskListResponse(responses);
     }
