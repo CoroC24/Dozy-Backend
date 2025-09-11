@@ -5,9 +5,11 @@ import com.cj.dozy.task.dto.addtask.request.AddTaskRequest;
 import com.cj.dozy.task.dto.addtask.response.AddTaskListResponse;
 import com.cj.dozy.task.dto.addtask.response.AddTaskResponse;
 import com.cj.dozy.task.dto.deltask.request.DelTaskListRequest;
-import com.cj.dozy.task.dto.deltask.response.DelTaskListResponse;
 import com.cj.dozy.task.dto.deltask.request.DelTaskRequest;
+import com.cj.dozy.task.dto.deltask.response.DelTaskListResponse;
 import com.cj.dozy.task.dto.deltask.response.DelTaskResponse;
+import com.cj.dozy.task.dto.gettasks.request.GetTasksRequest;
+import com.cj.dozy.task.dto.gettasks.response.GetTasksListResponse;
 import com.cj.dozy.task.dto.modtask.request.ModTaskListRequest;
 import com.cj.dozy.task.dto.modtask.request.ModTaskRequest;
 import com.cj.dozy.task.dto.modtask.response.ModTaskListResponse;
@@ -17,9 +19,7 @@ import com.cj.dozy.task.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -36,10 +36,10 @@ public class TaskService {
         List<AddTaskResponse> responses = new ArrayList<>();
 
         for (AddTaskRequest task : addTaskReq.getTasks()) {
-            if (validateRequiredFields(task.getTitle(), task.getDate(), task.getStatus())) {
+            if (validateRequiredFields(task.getTitle(), task.getDate(), task.getStatus(), task.getUserId())) {
                 validTasks.add(task);
             } else {
-                responses.add(new AddTaskResponse(task.getUuid(), null, "The task to be added has empty fields: Title, Date, or Status"));
+                responses.add(new AddTaskResponse(task.getUuid(), null, "The task to be added has empty fields: Title, Date, Status or UserId"));
             }
         }
 
@@ -59,9 +59,8 @@ public class TaskService {
 
             List<Task> savedTasks = taskRepository.saveAll(tasks);
 
-            IntStream.range(0, validTasks.size()).forEach(i -> {
-                responses.add(new AddTaskResponse(validTasks.get(i).getUuid(), savedTasks.get(i).getId(), "Task added successfully"));
-            });
+            IntStream.range(0, validTasks.size()).forEach(i ->
+                    responses.add(new AddTaskResponse(validTasks.get(i).getUuid(), savedTasks.get(i).getId(), "Task added successfully")));
         }
 
         return new AddTaskListResponse(responses);
@@ -75,13 +74,13 @@ public class TaskService {
         List<ModTaskResponse> responses = new ArrayList<>();
 
         IntStream.range(0, tasksIds.size()).forEach(i -> {
-            ModTaskRequest taskReq = modTaskReq.getTasks().get(i);
+            ModTaskRequest task = modTaskReq.getTasks().get(i);
 
-            if (existingIds.contains(taskReq.getId())
-                    && validateRequiredFields(taskReq.getTitle(), taskReq.getDate(), taskReq.getStatus())) {
-                validTasks.add(taskReq);
+            if (existingIds.contains(task.getId())
+                    && validateRequiredFields(task.getTitle(), task.getDate(), task.getStatus(), task.getUserId())) {
+                validTasks.add(task);
             } else {
-                responses.add(new ModTaskResponse(taskReq.getUuid(), taskReq.getId(), "Task not found in DB, cannot be updated"));
+                responses.add(new ModTaskResponse(task.getUuid(), task.getId(), "Task not found in DB, cannot be updated"));
             }
         });
 
@@ -102,9 +101,8 @@ public class TaskService {
 
             List<Task> updatedTasks = taskRepository.saveAll(tasks);
 
-            IntStream.range(0, validTasks.size()).forEach(i -> {
-                responses.add(new ModTaskResponse(validTasks.get(i).getUuid(), updatedTasks.get(i).getId(), "Task updated successfully"));
-            });
+            IntStream.range(0, validTasks.size()).forEach(i ->
+                    responses.add(new ModTaskResponse(validTasks.get(i).getUuid(), updatedTasks.get(i).getId(), "Task updated successfully")));
         }
 
         return new ModTaskListResponse(responses);
@@ -132,15 +130,30 @@ public class TaskService {
         if (!validIds.isEmpty()) {
             taskRepository.deleteAllById(tasksIds);
 
-            IntStream.range(0, validIds.size()).forEach(i -> {
-                responses.add(new DelTaskResponse(delTaskReq.getTasks().get(i).getUuid(), validIds.get(i), "Task deleted successfully"));
-            });
+            IntStream.range(0, validIds.size()).forEach(i ->
+                    responses.add(new DelTaskResponse(delTaskReq.getTasks().get(i).getUuid(), validIds.get(i), "Task deleted successfully")));
         }
 
         return new DelTaskListResponse(responses);
     }
 
-    private boolean validateRequiredFields(String title, String date, String status) {
-        return isNotBlank(title) && isNotBlank(date) && isNotBlank(status);
+    public GetTasksListResponse getTasksByUserId(GetTasksRequest getTaskReq) {
+        Long userId = getTaskReq.getUserId();
+
+        List<Long> clientIds = getTaskReq.getLocalIds();
+        List<Long> dbIds = taskRepository.findTasksIdsByUserId(userId);
+
+        if (dbIds.isEmpty()) throw new NoSuchElementException("There are no tasks with the specified user ID in the database");
+
+        Set<Long> clientSet = new HashSet<>(clientIds);
+        List<Long> missingInClient = dbIds.stream().filter(id -> !clientSet.contains(id)).toList();
+
+        List<Task> tasksResponses = missingInClient.isEmpty() ? List.of() : taskRepository.findAllById(missingInClient);
+
+        return new GetTasksListResponse(tasksResponses);
+    }
+
+    private boolean validateRequiredFields(String title, String date, String status, Long userId) {
+        return isNotBlank(title) && isNotBlank(date) && isNotBlank(status) && isNotBlank(userId.toString());
     }
 }

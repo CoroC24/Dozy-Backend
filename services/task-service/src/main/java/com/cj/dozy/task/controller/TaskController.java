@@ -2,6 +2,8 @@ package com.cj.dozy.task.controller;
 
 import com.cj.dozy.task.dto.addtask.request.AddTaskListRequest;
 import com.cj.dozy.task.dto.deltask.request.DelTaskListRequest;
+import com.cj.dozy.task.dto.gettasks.request.GetTasksRequest;
+import com.cj.dozy.task.dto.gettasks.response.GetTasksListResponse;
 import com.cj.dozy.task.dto.modtask.request.ModTaskListRequest;
 import com.cj.dozy.task.dto.addtask.response.AddTaskListResponse;
 import com.cj.dozy.task.dto.deltask.response.DelTaskListResponse;
@@ -32,5 +34,10 @@ public class TaskController {
     @DeleteMapping("/delete")
     public ResponseEntity<DelTaskListResponse> deleteTask(@RequestBody DelTaskListRequest taskRequest) {
         return new ResponseEntity<>(taskService.deleteTask(taskRequest), HttpStatus.OK);
+    }
+
+    @GetMapping("/get-tasks")
+    public ResponseEntity<GetTasksListResponse> getTasks(@RequestBody GetTasksRequest taskRequest) {
+        return new ResponseEntity<>(taskService.getTasksByUserId(taskRequest), HttpStatus.OK);
     }
 }
